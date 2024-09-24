@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  first_name  String
+  last_name   String
+  email       String        @unique
+  password    String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  Transaction Transaction[]
+  Debt Debt[]
+  Investment Investment[]
+  InvestmentDetail InvestmentDetail[]
+}
+
+model Transaction {
+  id                String   @id @default(uuid())
+  user_id           String
+  user              User     @relation(fields: [user_id], references: [id])
+  type              String
+  amount            Float
+  description       String
+  category          String
+  date              DateTime
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  is_recurring      Boolean
+  recurrence_period String? // 'monthly', 'yearly', etc. (opcional, pode ser nulo)
+  status            String // 'completed', 'pending', etc.
+
+  @@index([user_id]) // Índice para melhorar a busca por usuário
+}
+
+model Debt {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  debt_amount      Float
+  remaining_amount Float
+  description      String
+  due_date         DateTime // Data de vencimento
+  status           String   // Status da dívida: paga, vencida, etc.
+  monthly_payment  Float
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@index([userId]) // Índice para melhorar a busca por usuário
+}
+
+model Investment {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  investment_type String    // Tipo de investimento (por exemplo, ações, renda fixa, etc.)
+  amount          Float     // Valor investido
+  profit_loss     Float     // Lucro ou prejuízo do investimento
+  description     String    // Descrição do investimento
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@index([userId]) // Índice para melhorar a busca por usuário
+}
+
+model InvestmentDetail {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  asset_name      String    // Nome do ativo (ex.: nome da ação, fundo, etc.)
+  asset_type      String    // Tipo de ativo (ex.: ações, imóveis, etc.)
+  quantity        Float     // Quantidade do ativo
+  purchase_price  Float     // Preço de compra do ativo
+  current_value   Float     // Valor atual do ativo
+  profit_loss     Float     // Lucro ou prejuízo com o ativo
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@index([userId]) // Índice para melhorar a busca por usuário
+}
