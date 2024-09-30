@@ -30,7 +30,7 @@ model User {
 model Transaction {
   id                String   @id @default(uuid())
   user_id           String
-  user              User     @relation(fields: [user_id], references: [id])
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   type              String
   amount            Float
   description       String
@@ -38,17 +38,13 @@ model Transaction {
   date              DateTime
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
-  is_recurring      Boolean
-  recurrence_period String? // 'monthly', 'yearly', etc. (opcional, pode ser nulo)
-  status            String // 'completed', 'pending', etc.
-
   @@index([user_id]) // Índice para melhorar a busca por usuário
 }
 
 model Debt {
   id               String   @id @default(uuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id])
+  user_id          String
+  user             User     @relation(fields: [user_id], references: [id])
   debt_amount      Float
   remaining_amount Float
   description      String
@@ -59,13 +55,13 @@ model Debt {
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
-  @@index([userId]) // Índice para melhorar a busca por usuário
+  @@index([user_id]) // Índice para melhorar a busca por usuário
 }
 
 model Investment {
   id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
+  user_id         String
+  user            User      @relation(fields: [user_id], references: [id])
   investment_type String    // Tipo de investimento (por exemplo, ações, renda fixa, etc.)
   amount          Float     // Valor investido
   profit_loss     Float     // Lucro ou prejuízo do investimento
@@ -73,13 +69,13 @@ model Investment {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  @@index([userId]) // Índice para melhorar a busca por usuário
+  @@index([user_id]) // Índice para melhorar a busca por usuário
 }
 
 model InvestmentDetail {
   id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
+  user_id         String
+  user            User      @relation(fields: [user_id], references: [id])
   asset_name      String    // Nome do ativo (ex.: nome da ação, fundo, etc.)
   asset_type      String    // Tipo de ativo (ex.: ações, imóveis, etc.)
   quantity        Float     // Quantidade do ativo
@@ -89,5 +85,5 @@ model InvestmentDetail {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  @@index([userId]) // Índice para melhorar a busca por usuário
+  @@index([user_id]) // Índice para melhorar a busca por usuário
 }
