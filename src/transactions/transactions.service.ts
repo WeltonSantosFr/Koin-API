@@ -6,7 +6,7 @@ import { CreateTransactionDto } from './transaction.dto';
 export class TransactionsService {
   constructor(private prisma: PrismaService) {}
 
-  async createTransaction(data: CreateTransactionDto) {
+  async createTransaction(data: CreateTransactionDto, userId: string) {
     return this.prisma.transaction.create({
       data: {
         type: data.type,
@@ -16,7 +16,7 @@ export class TransactionsService {
         date: data.date,
         user: {
           connect: {
-            id: data.userId,
+            id: userId,
           },
         },
       },
@@ -33,16 +33,20 @@ export class TransactionsService {
     });
   }
 
-  async update(id: string, data: Partial<CreateTransactionDto>) {
+  async update(
+    id: string,
+    data: Partial<CreateTransactionDto>,
+    userId: string,
+  ) {
     return this.prisma.transaction.update({
-      where: { id },
+      where: { id, user_id: userId },
       data,
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     return this.prisma.transaction.delete({
-      where: { id },
+      where: { id, user_id: userId },
     });
   }
 }
